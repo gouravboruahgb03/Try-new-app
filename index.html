@@ -6,184 +6,257 @@
 <title>Rank the System Design Stack</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=Caveat+Brush&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f6f7f9;
-    --ink: #0f172a;
-    --muted: #475569;
-    --faint: #94a3b8;
-    --card: #ffffff;
-    --line: #e5e7eb;
-    --blue: #2563eb;
-    --blue-dark: #1d4ed8;
-    --chip: #f1f5f9;
-    --chip-line: #e2e8f0;
-    --s: #ef4444; --a: #f97316; --b: #eab308; --c: #22c55e; --d: #3b82f6;
+    --wall: #d9dcd8;
+    --board: #fbfcfa;
+    --frame: #bac0c5;
+    --frame-hi: #e4e7e9;
+    --ink: #25272b;
+    --ink-soft: #595e65;
+    --rule: rgba(37, 39, 43, .26);
+    --smudge: rgba(37, 39, 43, .035);
+    --magnet: #ffffff;
+    --magnet-edge: #d3d7da;
+    --ledge-top: #eceef0;
+    --ledge-bot: #c3c8cd;
+    --s: #d3263a; --a: #1f55c8; --b: #16804a; --c: #7043a8; --d: #25272b;
+    --focus: #1f55c8;
     --tray-h: 150px;
-    --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+    --marker: "Caveat Brush", "Segoe Print", "Bradley Hand", cursive;
+    --sans: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color-scheme: light;
   }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --wall: #1d2023;
+      --board: #111315;
+      --frame: #3a3f44;
+      --frame-hi: #50565c;
+      --ink: #eceee9;
+      --ink-soft: #a3a9ae;
+      --rule: rgba(236, 238, 233, .22);
+      --smudge: rgba(236, 238, 233, .025);
+      --magnet: #26292d;
+      --magnet-edge: #3c4146;
+      --ledge-top: #3a3e43;
+      --ledge-bot: #25282b;
+      --s: #ff5f6e; --a: #74a3ff; --b: #45d18d; --c: #b88fff; --d: #eceee9;
+      --focus: #74a3ff;
+      color-scheme: dark;
+    }
+  }
+
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
-    background-color: var(--bg);
-    background-image: radial-gradient(#dfe3ea 1px, transparent 1px);
-    background-size: 22px 22px;
+    background: var(--wall);
     color: var(--ink);
     font-family: var(--sans);
-    font-size: 14px;
+    font-size: 15px;
+    font-variation-settings: "wdth" 96;
     -webkit-font-smoothing: antialiased;
-    padding: 48px 20px calc(var(--tray-h) + 32px);
+    padding: 40px 24px calc(var(--tray-h) + 40px);
   }
-  .wrap { max-width: 880px; margin: 0 auto; }
-
-  /* ---------- Header ---------- */
-  .eyebrow {
-    font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
-    color: var(--faint); text-transform: uppercase;
-    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
-  }
-  .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--faint); }
-  h1 {
-    font-size: clamp(30px, 6vw, 46px); line-height: 1.05; letter-spacing: -.035em;
-    font-weight: 900; margin: 0 0 14px;
-  }
-  h1 em { font-style: normal; color: var(--blue); }
-  .sub { color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 440px; margin: 0 0 18px; }
-  .hint { font-family: var(--mono); font-size: 12px; color: var(--blue); margin: 0 0 30px; }
 
   /* ---------- Board ---------- */
-  #board { padding: 4px; }
-  .export-title { display: none; }
-  .tiers { display: flex; flex-direction: column; gap: 14px; }
+  .board {
+    max-width: 920px; margin: 0 auto;
+    background-color: var(--board);
+    background-image:
+      radial-gradient(ellipse 38% 7% at 74% 16%, var(--smudge), transparent 70%),
+      radial-gradient(ellipse 26% 6% at 22% 58%, var(--smudge), transparent 70%),
+      radial-gradient(ellipse 30% 5% at 64% 88%, var(--smudge), transparent 70%);
+    border: 10px solid var(--frame);
+    border-radius: 8px;
+    box-shadow:
+      inset 0 0 0 1px var(--frame-hi),
+      0 1px 0 1px rgba(0, 0, 0, .06),
+      0 28px 48px -28px rgba(0, 0, 0, .35);
+    padding: 36px 40px 28px;
+  }
+  .title {
+    font-family: var(--marker); font-weight: 400;
+    font-size: clamp(42px, 7.4vw, 70px); line-height: .95; letter-spacing: -.005em;
+    margin: 0 0 14px; color: var(--ink);
+    transform: rotate(-1deg); transform-origin: left bottom;
+    width: fit-content;
+    animation: write 1.1s cubic-bezier(.55, .1, .35, 1) .15s both;
+  }
+  @keyframes write {
+    from { clip-path: inset(-10% 100% -20% 0); }
+    to   { clip-path: inset(-10% 0 -20% 0); }
+  }
+  .sub {
+    color: var(--ink-soft); font-size: 15px; line-height: 1.55;
+    max-width: 58ch; margin: 0 0 28px;
+  }
+  kbd {
+    font: inherit; font-weight: 600; color: var(--ink);
+    border: 1px solid var(--magnet-edge); border-bottom-width: 2px;
+    border-radius: 4px; padding: 0 5px; background: var(--magnet);
+  }
+
+  /* ---------- Tiers ---------- */
   .tier {
-    display: flex; background: var(--card); border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 14px rgba(15,23,42,.05);
-    min-height: 90px; overflow: hidden;
+    position: relative; display: flex; min-height: 92px;
+  }
+  .tier + .tier::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -4px; height: 8px;
+    background: var(--rule);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 8'%3E%3Cpath d='M1 4.5C60 2 110 6.5 170 4S280 2.2 330 4.8 385 3.6 399 4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x 0 0 / 400px 8px;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 8'%3E%3Cpath d='M1 4.5C60 2 110 6.5 170 4S280 2.2 330 4.8 385 3.6 399 4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x 0 0 / 400px 8px;
   }
   .tier-label {
-    flex: 0 0 78px; display: grid; place-items: center;
-    color: #fff; font-weight: 900; font-size: 32px; letter-spacing: -.02em;
-    border-radius: 10px 0 0 10px;
+    position: relative; flex: 0 0 84px;
+    display: grid; place-items: center;
+    font-family: var(--marker); font-size: 60px; line-height: 1;
+    color: var(--tier);
+  }
+  .tier-label span { transform: rotate(var(--tilt)); display: block; }
+  .tier-label::after {
+    content: ""; position: absolute; right: 0; top: 10px; bottom: 10px; width: 8px;
+    background: var(--rule);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 160'%3E%3Cpath d='M4 1C2.4 40 5.8 80 3.8 120S4.6 150 4.2 159' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / 8px 100%;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 160'%3E%3Cpath d='M4 1C2.4 40 5.8 80 3.8 120S4.6 150 4.2 159' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / 8px 100%;
   }
   .zone {
     flex: 1; display: flex; flex-wrap: wrap; align-content: flex-start; align-items: flex-start;
-    gap: 8px; padding: 14px; min-height: 90px;
+    gap: 9px; padding: 20px 4px 20px 20px; min-height: 92px;
+    border-radius: 6px;
     transition: background-color .15s ease;
   }
-  .zone.over { background: #eff6ff; }
+  .tier .zone.over { background: color-mix(in srgb, var(--tier) 9%, transparent); }
 
-  /* ---------- Chips ---------- */
+  /* ---------- Magnets ---------- */
   .chip {
-    background: var(--chip); border: 1px solid var(--chip-line); border-radius: 8px;
-    padding: 8px 12px; font-size: 13px; font-weight: 500; color: var(--ink);
+    background: var(--magnet);
+    border: 1px solid var(--magnet-edge);
+    border-left: 5px solid var(--magnet-edge);
+    border-radius: 5px;
+    padding: 8px 12px 8px 10px;
+    font-size: 14px; font-weight: 550; color: var(--ink);
+    font-variation-settings: "wdth" 88;
+    box-shadow: 0 1px 0 var(--magnet-edge), 0 2px 5px rgba(20, 24, 28, .1);
     cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none;
-    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
     white-space: nowrap;
+    transition: box-shadow .12s ease, opacity .12s ease;
   }
-  .chip:hover { border-color: #cbd5e1; box-shadow: 0 1px 3px rgba(15,23,42,.08); }
-  .chip:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-  .chip.placeholder { opacity: .3; }
+  .tier .chip { border-left-color: var(--tier); }
+  .chip:hover { box-shadow: 0 1px 0 var(--magnet-edge), 0 4px 10px rgba(20, 24, 28, .14); }
+  .chip:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+  .chip.placeholder { opacity: .28; box-shadow: none; }
   .ghost {
-    position: fixed; left: 0; top: 0; z-index: 1000; pointer-events: none;
-    cursor: grabbing; background: #fff; border-color: var(--blue);
-    box-shadow: 0 10px 28px rgba(15,23,42,.18); transform: rotate(-2deg);
+    position: fixed; left: 0; top: 0; z-index: 1000; pointer-events: none; margin: 0;
+    cursor: grabbing;
+    box-shadow: 0 2px 0 var(--magnet-edge), 0 16px 30px rgba(20, 24, 28, .26);
   }
   body.dragging, body.dragging * { cursor: grabbing !important; }
 
-  /* ---------- Tray ---------- */
-  .tray {
+  /* ---------- Marker ledge ---------- */
+  .ledge {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
-    background: rgba(255,255,255,.92);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    border-top: 1px solid var(--line);
-    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(var(--ledge-top), var(--ledge-bot));
+    border-top: 1px solid var(--frame-hi);
+    box-shadow: 0 -10px 30px -12px rgba(0, 0, 0, .28);
+    padding: 14px 24px calc(14px + env(safe-area-inset-bottom, 0px));
   }
-  .tray-inner { max-width: 880px; margin: 0 auto; display: flex; gap: 16px; align-items: flex-end; }
-  .tray-left { flex: 1; min-width: 0; }
-  .tray-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
-  .tray-title { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--muted); }
-  .tray-note { font-size: 12px; color: var(--muted); }
-  .tray .zone {
-    padding: 4px 0; min-height: 40px; max-height: 96px; overflow-y: auto;
-    border-radius: 8px;
+  .ledge-inner { max-width: 920px; margin: 0 auto; display: flex; gap: 20px; align-items: flex-end; }
+  .ledge-left { flex: 1; min-width: 0; }
+  .ledge-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .ledge-title { font-weight: 700; font-size: 14px; }
+  .ledge-count { font-size: 13.5px; color: var(--ink-soft); }
+  .ledge .zone {
+    padding: 2px 2px 6px; gap: 8px; min-height: 44px; max-height: 100px; overflow-y: auto;
   }
-  .tray .zone:empty::after {
-    content: "All ranked — nice."; font-size: 12px; color: var(--faint); padding: 10px 0;
+  .ledge .zone:empty::after {
+    content: "Every concept is on the board. Download or copy it to share.";
+    font-size: 14px; color: var(--ink-soft); padding: 10px 0;
   }
-  .actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .actions { display: flex; gap: 8px; flex-shrink: 0; padding-bottom: 6px; }
   .btn {
-    font: 600 13px var(--sans); border-radius: 8px; padding: 11px 16px; cursor: pointer;
-    border: 1px solid var(--line); background: #fff; color: var(--ink);
-    transition: background-color .15s, border-color .15s, transform .08s;
+    font: 600 14px var(--sans); font-variation-settings: "wdth" 96;
+    border-radius: 6px; padding: 10px 16px; cursor: pointer;
+    border: 1.5px solid var(--ink); background: transparent; color: var(--ink);
+    transition: background-color .15s, color .15s, border-color .15s, transform .08s;
     white-space: nowrap;
   }
-  .btn:hover { border-color: #cbd5e1; background: #f8fafc; }
+  .btn:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
   .btn:active { transform: translateY(1px); }
-  .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .btn.primary:hover { background: var(--blue-dark); border-color: var(--blue-dark); }
-  .btn.danger { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+  .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .btn.primary { background: var(--ink); color: var(--board); }
+  .btn.primary:hover { background: color-mix(in srgb, var(--ink) 86%, var(--board)); }
+  .btn.danger, .btn.danger:hover { background: var(--s); border-color: var(--s); color: #fff; }
   .btn:disabled { opacity: .6; cursor: progress; }
 
-  /* ---------- Popover ---------- */
+  /* ---------- Explainer card ---------- */
   .pop {
     position: fixed; z-index: 900; width: min(320px, calc(100vw - 32px));
-    background: #fff; border: 1px solid var(--line); border-radius: 12px;
-    box-shadow: 0 16px 40px rgba(15,23,42,.16); padding: 16px 18px;
+    background: var(--magnet); border: 1px solid var(--magnet-edge);
+    border-top: 5px solid var(--pop-c, var(--ink-soft));
+    border-radius: 6px;
+    box-shadow: 0 18px 40px rgba(20, 24, 28, .2);
+    padding: 14px 18px 16px;
     opacity: 0; transform: translateY(4px); transition: opacity .15s, transform .15s;
   }
   .pop.show { opacity: 1; transform: none; }
-  .pop h3 { margin: 0 0 6px; font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
-  .pop p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 13.5px; }
-  .pop .tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; color: var(--blue); margin-bottom: 6px; display: block; }
+  .pop .tag { display: block; font-size: 13px; font-weight: 600; color: var(--pop-c, var(--ink-soft)); }
+  .pop h3 { margin: 2px 0 6px; font: 400 30px/1.05 var(--marker); }
+  .pop p { margin: 0; color: var(--ink-soft); line-height: 1.55; font-size: 14.5px; }
 
   /* ---------- Toast ---------- */
   .toast {
     position: fixed; left: 50%; bottom: calc(var(--tray-h) + 16px); z-index: 950;
     transform: translate(-50%, 8px); opacity: 0; pointer-events: none;
-    background: var(--ink); color: #fff; font-size: 13px; font-weight: 500;
-    padding: 10px 14px; border-radius: 8px; transition: opacity .2s, transform .2s;
+    background: var(--ink); color: var(--board); font-size: 14px; font-weight: 600;
+    padding: 10px 16px; border-radius: 6px; transition: opacity .2s, transform .2s;
   }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
   /* ---------- Small screens ---------- */
   @media (max-width: 640px) {
-    body { padding: 32px 16px calc(var(--tray-h) + 24px); }
-    .tier-label { flex-basis: 52px; font-size: 24px; }
-    .zone { padding: 10px; gap: 6px; }
-    .chip { padding: 7px 10px; font-size: 12.5px; }
-    .tray { padding-left: 16px; padding-right: 16px; }
-    .tray-inner { flex-direction: column; align-items: stretch; gap: 10px; }
-    .actions .btn { flex: 1; }
+    body { padding: 16px 12px calc(var(--tray-h) + 24px); }
+    .board { border-width: 6px; padding: 24px 16px 16px; }
+    .sub { font-size: 14px; margin-bottom: 18px; }
+    .hide-touch { display: none; }
+    .tier, .zone { min-height: 76px; }
+    .tier-label { flex-basis: 52px; font-size: 44px; }
+    .zone { padding: 14px 0 14px 12px; gap: 7px; }
+    .chip { padding: 7px 10px 7px 8px; font-size: 13px; }
+    .ledge { padding-left: 16px; padding-right: 16px; }
+    .ledge-inner { flex-direction: column; align-items: stretch; gap: 8px; }
+    .ledge .zone { padding: 2px 2px 6px; min-height: 40px; max-height: 88px; }
+    .actions { padding-bottom: 0; }
+    .actions .btn { flex: 1; padding: 10px 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .title { animation: none; }
+    .pop, .toast, .chip, .zone, .btn { transition: none; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="eyebrow">Tool · Fig B</div>
-  <h1>Rank the <em>system design</em> stack.</h1>
-  <p class="sub">Drag each concept into a tier. When you're happy with it, download a shareable image or copy it to your clipboard.</p>
-  <p class="hint">→ Tap a concept to see what it is</p>
-
-  <div id="board">
-    <h2 class="export-title"></h2>
+<main>
+  <div class="board" id="board">
+    <h1 class="title">Rank the system design stack.</h1>
+    <p class="sub no-export">Drag each concept onto a tier, and tap one to read what it means.<span class="hide-touch"> From the keyboard, focus a concept and press <kbd>1</kbd>–<kbd>5</kbd> to place it or <kbd>0</kbd> to take it back down.</span></p>
     <div class="tiers" id="tiers"></div>
   </div>
-</div>
+</main>
 
-<div class="tray" id="tray">
-  <div class="tray-inner">
-    <div class="tray-left">
-      <div class="tray-head">
-        <span class="tray-title">UNRANKED</span>
-        <span class="tray-note">Drag into a tier above ↑</span>
+<div class="ledge" id="tray">
+  <div class="ledge-inner">
+    <div class="ledge-left">
+      <div class="ledge-head">
+        <span class="ledge-title">Unranked</span>
+        <span class="ledge-count" id="count"></span>
       </div>
-      <div class="zone" id="pool" data-zone="pool"></div>
+      <div class="zone" id="pool" data-zone="pool" aria-label="Unranked concepts"></div>
     </div>
     <div class="actions">
-      <button class="btn" id="resetBtn" type="button">Reset</button>
-      <button class="btn" id="copyBtn" type="button">Copy</button>
+      <button class="btn" id="resetBtn" type="button">Erase board</button>
+      <button class="btn" id="copyBtn" type="button">Copy image</button>
       <button class="btn primary" id="downloadBtn" type="button">Download PNG</button>
     </div>
   </div>
@@ -199,12 +272,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
 <script>
 (() => {
+  // Each tier is a different marker; the tilt makes the letters look hand-drawn.
   const TIERS = [
-    { id: "S", color: "var(--s)" },
-    { id: "A", color: "var(--a)" },
-    { id: "B", color: "var(--b)" },
-    { id: "C", color: "var(--c)" },
-    { id: "D", color: "var(--d)" },
+    { id: "S", color: "var(--s)", tilt: "-6deg" },
+    { id: "A", color: "var(--a)", tilt: "3deg" },
+    { id: "B", color: "var(--b)", tilt: "-2deg" },
+    { id: "C", color: "var(--c)", tilt: "5deg" },
+    { id: "D", color: "var(--d)", tilt: "-4deg" },
   ];
 
   const CONCEPTS = [
@@ -234,18 +308,22 @@
     ["obs", "Observability", "Metrics, logs and traces that let you understand what a system is doing, and why, from the outside."],
   ].map(([id, name, desc]) => ({ id, name, desc }));
   const byId = Object.fromEntries(CONCEPTS.map(c => [c.id, c]));
+  const tierById = Object.fromEntries(TIERS.map(t => [t.id, t]));
 
   const STORE_KEY = "sd-tierlist-v1";
   const $ = sel => document.querySelector(sel);
   const tiersEl = $("#tiers");
   const pool = $("#pool");
+  const countEl = $("#count");
 
   // ---------- Build tiers ----------
   const zones = { pool };
   for (const t of TIERS) {
-    const row = document.createElement("div");
+    const row = document.createElement("section");
     row.className = "tier";
-    row.innerHTML = `<div class="tier-label" style="background:${t.color}">${t.id}</div>
+    row.style.setProperty("--tier", t.color);
+    row.style.setProperty("--tilt", t.tilt);
+    row.innerHTML = `<div class="tier-label" aria-hidden="true"><span>${t.id}</span></div>
                      <div class="zone" data-zone="${t.id}" aria-label="Tier ${t.id}"></div>`;
     tiersEl.appendChild(row);
     zones[t.id] = row.querySelector(".zone");
@@ -261,6 +339,11 @@
     return el;
   }
 
+  function updateCount() {
+    const n = pool.querySelectorAll(".chip").length;
+    countEl.textContent = n ? `${n} of ${CONCEPTS.length} left to place` : "";
+  }
+
   // ---------- State ----------
   function readState() {
     try { return JSON.parse(localStorage.getItem(STORE_KEY)) || null; } catch { return null; }
@@ -271,6 +354,7 @@
       state[key] = [...z.querySelectorAll(".chip")].map(c => c.dataset.id);
     }
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch {}
+    updateCount();
   }
   function render(state) {
     Object.values(zones).forEach(z => (z.innerHTML = ""));
@@ -286,22 +370,25 @@
       }
     }
     for (const c of CONCEPTS) if (!placed.has(c.id)) pool.appendChild(makeChip(c));
+    updateCount();
   }
   render(readState());
 
-  // Keep body padding in sync with tray height.
+  // Keep body padding in sync with ledge height.
   const tray = $("#tray");
   const syncTray = () => document.documentElement.style.setProperty("--tray-h", tray.offsetHeight + "px");
   new ResizeObserver(syncTray).observe(tray);
   syncTray();
 
-  // ---------- Popover ----------
+  // ---------- Explainer card ----------
   const pop = $("#pop");
   let popFor = null;
   function openPop(chip) {
     const c = byId[chip.dataset.id];
     const zone = chip.closest(".zone").dataset.zone;
-    $("#popTag").textContent = zone === "pool" ? "UNRANKED" : `TIER ${zone}`;
+    const tier = tierById[zone];
+    $("#popTag").textContent = tier ? `Tier ${zone}` : "Unranked";
+    pop.style.setProperty("--pop-c", tier ? tier.color : "var(--ink-soft)");
     $("#popTitle").textContent = c.name;
     $("#popDesc").textContent = c.desc;
     pop.hidden = false;
@@ -371,6 +458,9 @@
     const g = drag.chip.cloneNode(true);
     g.classList.add("ghost");
     g.style.width = r.width + "px";
+    // Carry the tier color over so the lifted magnet matches where it came from.
+    const tier = drag.chip.closest(".tier");
+    if (tier) g.style.borderLeftColor = getComputedStyle(drag.chip).borderLeftColor;
     document.body.appendChild(g);
     drag.ghost = g;
     drag.chip.classList.add("placeholder");
@@ -447,12 +537,12 @@
     toastT = setTimeout(() => toastEl.classList.remove("show"), 2200);
   }
 
-  // ---------- Reset (inline confirm) ----------
+  // ---------- Erase (inline confirm) ----------
   const resetBtn = $("#resetBtn");
   let resetArmed = null;
   resetBtn.addEventListener("click", () => {
     if (!resetArmed) {
-      resetBtn.textContent = "Sure?";
+      resetBtn.textContent = "Erase everything?";
       resetBtn.classList.add("danger");
       resetArmed = setTimeout(disarm, 3000);
       return;
@@ -461,36 +551,32 @@
     closePop();
     render(null);
     saveState();
-    toast("Board reset");
+    toast("Board erased");
   });
   function disarm() {
     clearTimeout(resetArmed); resetArmed = null;
-    resetBtn.textContent = "Reset";
+    resetBtn.textContent = "Erase board";
     resetBtn.classList.remove("danger");
   }
 
   // ---------- Export ----------
+  // The board itself (frame, title, tiers) is the image; the instructions are left out.
   const board = $("#board");
-  const exportOpts = {
-    pixelRatio: 2,
-    backgroundColor: "#f6f7f9",
-    style: { padding: "28px" },
-  };
 
   async function renderBoard(kind) {
-    if (!window.htmlToImage) throw new Error("Export library failed to load (are you offline?)");
-    const title = board.querySelector(".export-title");
-    title.innerHTML = 'Rank the <em style="font-style:normal;color:#2563eb">system design</em> stack.';
-    title.style.cssText = "display:block;margin:0 0 20px;font:900 30px/1.1 Inter,system-ui,sans-serif;letter-spacing:-.03em;color:#0f172a";
+    if (!window.htmlToImage) throw new Error("The image exporter didn't load. Check your connection and reload the page.");
+    const opts = {
+      pixelRatio: 2,
+      backgroundColor: getComputedStyle(document.body).backgroundColor,
+      style: { margin: "0" },
+      filter: node => !(node.classList && node.classList.contains("no-export")),
+    };
     const fn = kind === "blob" ? htmlToImage.toBlob : htmlToImage.toPng;
     try {
-      return await fn(board, exportOpts);
+      return await fn(board, opts);
     } catch (err) {
       // Cross-origin font CSS can trip the font embedder, so retry without it.
-      return await fn(board, { ...exportOpts, skipFonts: true });
-    } finally {
-      title.style.cssText = "";
-      title.innerHTML = "";
+      return await fn(board, { ...opts, skipFonts: true });
     }
   }
 
@@ -499,7 +585,7 @@
       const old = btn.textContent;
       btn.disabled = true; btn.textContent = label;
       try { await work(); }
-      catch (err) { console.error(err); toast(err.message || "Something went wrong"); }
+      catch (err) { console.error(err); toast(err.message || "Export failed. Try Download PNG instead."); }
       finally { btn.disabled = false; btn.textContent = old; }
     };
   }
@@ -516,10 +602,10 @@
 
   $("#copyBtn").addEventListener("click", withBusy($("#copyBtn"), "Copying…", async () => {
     closePop();
-    if (!navigator.clipboard || !window.ClipboardItem) throw new Error("Clipboard images aren't supported here. Use Download PNG instead.");
+    if (!navigator.clipboard || !window.ClipboardItem) throw new Error("This browser can't copy images. Use Download PNG instead.");
     // Pass a promise so Safari keeps the user-gesture context.
     await navigator.clipboard.write([new ClipboardItem({ "image/png": renderBoard("blob") })]);
-    toast("Copied to clipboard");
+    toast("Image copied");
   }));
 })();
 </script>
