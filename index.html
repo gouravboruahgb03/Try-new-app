@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rank the System Design Stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --ink: #0f172a;
+    --muted: #475569;
+    --faint: #94a3b8;
+    --card: #ffffff;
+    --line: #e5e7eb;
+    --blue: #2563eb;
+    --blue-dark: #1d4ed8;
+    --chip: #f1f5f9;
+    --chip-line: #e2e8f0;
+    --s: #ef4444; --a: #f97316; --b: #eab308; --c: #22c55e; --d: #3b82f6;
+    --tray-h: 150px;
+    --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background-color: var(--bg);
+    background-image: radial-gradient(#dfe3ea 1px, transparent 1px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    padding: 48px 20px calc(var(--tray-h) + 32px);
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  /* ---------- Header ---------- */
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+    color: var(--faint); text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  }
+  .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--faint); }
+  h1 {
+    font-size: clamp(30px, 6vw, 46px); line-height: 1.05; letter-spacing: -.035em;
+    font-weight: 900; margin: 0 0 14px;
+  }
+  h1 em { font-style: normal; color: var(--blue); }
+  .sub { color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 440px; margin: 0 0 18px; }
+  .hint { font-family: var(--mono); font-size: 12px; color: var(--blue); margin: 0 0 30px; }
+
+  /* ---------- Board ---------- */
+  #board { padding: 4px; }
+  .export-title { display: none; }
+  .tiers { display: flex; flex-direction: column; gap: 14px; }
+  .tier {
+    display: flex; background: var(--card); border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 14px rgba(15,23,42,.05);
+    min-height: 90px; overflow: hidden;
+  }
+  .tier-label {
+    flex: 0 0 78px; display: grid; place-items: center;
+    color: #fff; font-weight: 900; font-size: 32px; letter-spacing: -.02em;
+    border-radius: 10px 0 0 10px;
+  }
+  .zone {
+    flex: 1; display: flex; flex-wrap: wrap; align-content: flex-start; align-items: flex-start;
+    gap: 8px; padding: 14px; min-height: 90px;
+    transition: background-color .15s ease;
+  }
+  .zone.over { background: #eff6ff; }
+
+  /* ---------- Chips ---------- */
+  .chip {
+    background: var(--chip); border: 1px solid var(--chip-line); border-radius: 8px;
+    padding: 8px 12px; font-size: 13px; font-weight: 500; color: var(--ink);
+    cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none;
+    transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: #cbd5e1; box-shadow: 0 1px 3px rgba(15,23,42,.08); }
+  .chip:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .chip.placeholder { opacity: .3; }
+  .ghost {
+    position: fixed; left: 0; top: 0; z-index: 1000; pointer-events: none;
+    cursor: grabbing; background: #fff; border-color: var(--blue);
+    box-shadow: 0 10px 28px rgba(15,23,42,.18); transform: rotate(-2deg);
+  }
+  body.dragging, body.dragging * { cursor: grabbing !important; }
+
+  /* ---------- Tray ---------- */
+  .tray {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line);
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+  .tray-inner { max-width: 880px; margin: 0 auto; display: flex; gap: 16px; align-items: flex-end; }
+  .tray-left { flex: 1; min-width: 0; }
+  .tray-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .tray-title { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--muted); }
+  .tray-note { font-size: 12px; color: var(--muted); }
+  .tray .zone {
+    padding: 4px 0; min-height: 40px; max-height: 96px; overflow-y: auto;
+    border-radius: 8px;
+  }
+  .tray .zone:empty::after {
+    content: "All ranked — nice."; font-size: 12px; color: var(--faint); padding: 10px 0;
+  }
+  .actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .btn {
+    font: 600 13px var(--sans); border-radius: 8px; padding: 11px 16px; cursor: pointer;
+    border: 1px solid var(--line); background: #fff; color: var(--ink);
+    transition: background-color .15s, border-color .15s, transform .08s;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: #cbd5e1; background: #f8fafc; }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .btn.primary:hover { background: var(--blue-dark); border-color: var(--blue-dark); }
+  .btn.danger { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+  .btn:disabled { opacity: .6; cursor: progress; }
+
+  /* ---------- Popover ---------- */
+  .pop {
+    position: fixed; z-index: 900; width: min(320px, calc(100vw - 32px));
+    background: #fff; border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(15,23,42,.16); padding: 16px 18px;
+    opacity: 0; transform: translateY(4px); transition: opacity .15s, transform .15s;
+  }
+  .pop.show { opacity: 1; transform: none; }
+  .pop h3 { margin: 0 0 6px; font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+  .pop p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 13.5px; }
+  .pop .tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; color: var(--blue); margin-bottom: 6px; display: block; }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed; left: 50%; bottom: calc(var(--tray-h) + 16px); z-index: 950;
+    transform: translate(-50%, 8px); opacity: 0; pointer-events: none;
+    background: var(--ink); color: #fff; font-size: 13px; font-weight: 500;
+    padding: 10px 14px; border-radius: 8px; transition: opacity .2s, transform .2s;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- Small screens ---------- */
+  @media (max-width: 640px) {
+    body { padding: 32px 16px calc(var(--tray-h) + 24px); }
+    .tier-label { flex-basis: 52px; font-size: 24px; }
+    .zone { padding: 10px; gap: 6px; }
+    .chip { padding: 7px 10px; font-size: 12.5px; }
+    .tray { padding-left: 16px; padding-right: 16px; }
+    .tray-inner { flex-direction: column; align-items: stretch; gap: 10px; }
+    .actions .btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Tool · Fig B</div>
+  <h1>Rank the <em>system design</em> stack.</h1>
+  <p class="sub">Drag each concept into a tier. When you're happy with it, download a shareable image or copy it to your clipboard.</p>
+  <p class="hint">→ Tap a concept to see what it is</p>
+
+  <div id="board">
+    <h2 class="export-title"></h2>
+    <div class="tiers" id="tiers"></div>
+  </div>
+</div>
+
+<div class="tray" id="tray">
+  <div class="tray-inner">
+    <div class="tray-left">
+      <div class="tray-head">
+        <span class="tray-title">UNRANKED</span>
+        <span class="tray-note">Drag into a tier above ↑</span>
+      </div>
+      <div class="zone" id="pool" data-zone="pool"></div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="resetBtn" type="button">Reset</button>
+      <button class="btn" id="copyBtn" type="button">Copy</button>
+      <button class="btn primary" id="downloadBtn" type="button">Download PNG</button>
+    </div>
+  </div>
+</div>
+
+<div class="pop" id="pop" role="dialog" aria-live="polite" hidden>
+  <span class="tag" id="popTag"></span>
+  <h3 id="popTitle"></h3>
+  <p id="popDesc"></p>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+<script>
+(() => {
+  const TIERS = [
+    { id: "S", color: "var(--s)" },
+    { id: "A", color: "var(--a)" },
+    { id: "B", color: "var(--b)" },
+    { id: "C", color: "var(--c)" },
+    { id: "D", color: "var(--d)" },
+  ];
+
+  const CONCEPTS = [
+    ["lb", "Load Balancer", "Spreads incoming requests across multiple servers so no single machine is overwhelmed, and routes around unhealthy ones."],
+    ["cdn", "CDN", "A network of edge servers that caches static content close to users, cutting latency and offloading your origin."],
+    ["cache", "Cache (Redis)", "An in-memory store that keeps hot data close at hand so repeated reads skip the slow database."],
+    ["mq", "Message Queue", "A buffer that lets producers hand off work to consumers asynchronously, smoothing spikes and decoupling services."],
+    ["shard", "Sharding", "Splitting one dataset across many databases by a key, so each node holds only a slice and writes scale horizontally."],
+    ["repl", "Replication", "Keeping copies of data on multiple nodes for read scaling and for surviving machine failures."],
+    ["cap", "CAP Theorem", "During a network partition, a distributed system must choose between consistency and availability."],
+    ["chash", "Consistent Hashing", "A hashing scheme where adding or removing a node only remaps a small fraction of keys, which is ideal for caches and shards."],
+    ["rl", "Rate Limiter", "Caps how many requests a client can make in a time window to protect services from abuse and overload."],
+    ["gw", "API Gateway", "A single entry point that handles routing, auth, rate limiting and aggregation in front of backend services."],
+    ["micro", "Microservices", "An architecture of small, independently deployable services, each owning one business capability and its data."],
+    ["mono", "Monolith", "One deployable application containing all features. It is simple to build and run, but harder to scale teams around."],
+    ["es", "Event Sourcing", "Storing every state change as an immutable event, and rebuilding current state by replaying the log."],
+    ["cqrs", "CQRS", "Separating the write model (commands) from the read model (queries) so each can be optimized on its own."],
+    ["cb", "Circuit Breaker", "Stops calling a failing dependency after repeated errors, failing fast until it recovers and preventing cascading failures."],
+    ["mesh", "Service Mesh", "An infrastructure layer (often sidecar proxies) handling service-to-service traffic, retries, mTLS and telemetry."],
+    ["k8s", "Kubernetes", "A container orchestrator that schedules, scales, heals and networks your workloads across a cluster."],
+    ["sls", "Serverless", "Running code as on-demand functions with no servers to manage. It scales to zero, and you pay per invocation."],
+    ["sql", "SQL Database", "A relational store with schemas, joins and ACID transactions. It is the dependable default for structured data."],
+    ["nosql", "NoSQL", "Non-relational stores (key-value, document, wide-column, graph) that trade some guarantees for scale or flexible schemas."],
+    ["idem", "Idempotency", "Designing operations so retrying them has the same effect as doing them once, which is essential for safe retries."],
+    ["bloom", "Bloom Filter", "A compact probabilistic set. It can say \"definitely not present\" or \"maybe present\" using very little memory."],
+    ["ws", "WebSockets", "A persistent, full-duplex connection between client and server for real-time updates without polling."],
+    ["obs", "Observability", "Metrics, logs and traces that let you understand what a system is doing, and why, from the outside."],
+  ].map(([id, name, desc]) => ({ id, name, desc }));
+  const byId = Object.fromEntries(CONCEPTS.map(c => [c.id, c]));
+
+  const STORE_KEY = "sd-tierlist-v1";
+  const $ = sel => document.querySelector(sel);
+  const tiersEl = $("#tiers");
+  const pool = $("#pool");
+
+  // ---------- Build tiers ----------
+  const zones = { pool };
+  for (const t of TIERS) {
+    const row = document.createElement("div");
+    row.className = "tier";
+    row.innerHTML = `<div class="tier-label" style="background:${t.color}">${t.id}</div>
+                     <div class="zone" data-zone="${t.id}" aria-label="Tier ${t.id}"></div>`;
+    tiersEl.appendChild(row);
+    zones[t.id] = row.querySelector(".zone");
+  }
+
+  function makeChip(c) {
+    const el = document.createElement("div");
+    el.className = "chip";
+    el.textContent = c.name;
+    el.dataset.id = c.id;
+    el.tabIndex = 0;
+    el.setAttribute("role", "button");
+    return el;
+  }
+
+  // ---------- State ----------
+  function readState() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || null; } catch { return null; }
+  }
+  function saveState() {
+    const state = {};
+    for (const [key, z] of Object.entries(zones)) {
+      state[key] = [...z.querySelectorAll(".chip")].map(c => c.dataset.id);
+    }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch {}
+  }
+  function render(state) {
+    Object.values(zones).forEach(z => (z.innerHTML = ""));
+    const placed = new Set();
+    if (state) {
+      for (const t of TIERS) {
+        for (const id of state[t.id] || []) {
+          if (byId[id] && !placed.has(id)) { zones[t.id].appendChild(makeChip(byId[id])); placed.add(id); }
+        }
+      }
+      for (const id of state.pool || []) {
+        if (byId[id] && !placed.has(id)) { pool.appendChild(makeChip(byId[id])); placed.add(id); }
+      }
+    }
+    for (const c of CONCEPTS) if (!placed.has(c.id)) pool.appendChild(makeChip(c));
+  }
+  render(readState());
+
+  // Keep body padding in sync with tray height.
+  const tray = $("#tray");
+  const syncTray = () => document.documentElement.style.setProperty("--tray-h", tray.offsetHeight + "px");
+  new ResizeObserver(syncTray).observe(tray);
+  syncTray();
+
+  // ---------- Popover ----------
+  const pop = $("#pop");
+  let popFor = null;
+  function openPop(chip) {
+    const c = byId[chip.dataset.id];
+    const zone = chip.closest(".zone").dataset.zone;
+    $("#popTag").textContent = zone === "pool" ? "UNRANKED" : `TIER ${zone}`;
+    $("#popTitle").textContent = c.name;
+    $("#popDesc").textContent = c.desc;
+    pop.hidden = false;
+    const r = chip.getBoundingClientRect();
+    const pw = pop.offsetWidth, ph = pop.offsetHeight, m = 12;
+    let left = Math.min(Math.max(m, r.left + r.width / 2 - pw / 2), innerWidth - pw - m);
+    let top = r.top - ph - 10;
+    if (top < m) top = r.bottom + 10;
+    if (top + ph > innerHeight - m) top = Math.max(m, innerHeight - ph - m);
+    pop.style.left = left + "px";
+    pop.style.top = top + "px";
+    requestAnimationFrame(() => pop.classList.add("show"));
+    popFor = chip;
+  }
+  function closePop() {
+    if (pop.hidden) return;
+    pop.classList.remove("show");
+    pop.hidden = true;
+    popFor = null;
+  }
+  document.addEventListener("pointerdown", e => {
+    if (!pop.hidden && !pop.contains(e.target) && !e.target.closest(".chip")) closePop();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closePop(); });
+  addEventListener("scroll", closePop, { passive: true });
+  addEventListener("resize", closePop);
+
+  // Keyboard: Enter/Space shows info, 1–5 moves to S–D, 0 unranks.
+  document.addEventListener("keydown", e => {
+    const chip = e.target.closest && e.target.closest(".chip");
+    if (!chip) return;
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); popFor === chip ? closePop() : openPop(chip); return; }
+    const n = "012345".indexOf(e.key);
+    if (n >= 0) {
+      const target = n === 0 ? pool : zones[TIERS[n - 1].id];
+      target.appendChild(chip); chip.focus(); closePop(); saveState();
+    }
+  });
+
+  // ---------- Pointer drag & drop ----------
+  const DRAG_THRESHOLD = 5;
+  let drag = null;
+
+  document.addEventListener("pointerdown", e => {
+    const chip = e.target.closest(".chip");
+    if (!chip || e.button !== 0 || chip.classList.contains("ghost")) return;
+    e.preventDefault();
+    drag = { chip, startX: e.clientX, startY: e.clientY, x: e.clientX, y: e.clientY, active: false, ghost: null, raf: 0 };
+  });
+
+  document.addEventListener("pointermove", e => {
+    if (!drag) return;
+    drag.x = e.clientX; drag.y = e.clientY;
+    if (!drag.active) {
+      if (Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY) < DRAG_THRESHOLD) return;
+      startDrag();
+    }
+    moveGhost();
+    updateDrop();
+  });
+
+  function startDrag() {
+    closePop();
+    const r = drag.chip.getBoundingClientRect();
+    drag.offX = drag.startX - r.left;
+    drag.offY = drag.startY - r.top;
+    const g = drag.chip.cloneNode(true);
+    g.classList.add("ghost");
+    g.style.width = r.width + "px";
+    document.body.appendChild(g);
+    drag.ghost = g;
+    drag.chip.classList.add("placeholder");
+    drag.active = true;
+    document.body.classList.add("dragging");
+    const loop = () => { if (!drag) return; autoScroll(); drag.raf = requestAnimationFrame(loop); };
+    drag.raf = requestAnimationFrame(loop);
+  }
+
+  function moveGhost() {
+    drag.ghost.style.transform = `translate(${drag.x - drag.offX}px, ${drag.y - drag.offY}px) rotate(-2deg)`;
+  }
+
+  function autoScroll() {
+    const edge = 70, trayTop = tray.getBoundingClientRect().top;
+    let dy = 0;
+    if (drag.y < edge) dy = -Math.ceil((edge - drag.y) / 5);
+    else if (drag.y > trayTop - edge && drag.y < trayTop) dy = Math.ceil((drag.y - (trayTop - edge)) / 5);
+    if (dy) { scrollBy(0, dy); updateDrop(); }
+  }
+
+  function zoneAt(x, y) {
+    const el = document.elementFromPoint(x, y);
+    if (!el) return null;
+    const z = el.closest("[data-zone]");
+    if (z) return z;
+    const tier = el.closest(".tier");
+    return tier ? tier.querySelector(".zone") : null;
+  }
+
+  function updateDrop() {
+    const zone = zoneAt(drag.x, drag.y);
+    Object.values(zones).forEach(z => z.classList.toggle("over", z === zone && z !== pool));
+    if (!zone) return;
+    const others = [...zone.querySelectorAll(".chip")].filter(c => c !== drag.chip);
+    let before = null;
+    for (const c of others) {
+      const r = c.getBoundingClientRect();
+      if (drag.y < r.top) { before = c; break; }
+      if (drag.y <= r.bottom && drag.x < r.left + r.width / 2) { before = c; break; }
+    }
+    if (before) {
+      if (drag.chip.nextSibling !== before || drag.chip.parentNode !== zone) zone.insertBefore(drag.chip, before);
+    } else if (zone.lastElementChild !== drag.chip) {
+      zone.appendChild(drag.chip);
+    }
+  }
+
+  function endDrag(cancelled) {
+    if (!drag) return;
+    const d = drag;
+    drag = null;
+    cancelAnimationFrame(d.raf);
+    if (d.active) {
+      d.ghost.remove();
+      d.chip.classList.remove("placeholder");
+      document.body.classList.remove("dragging");
+      Object.values(zones).forEach(z => z.classList.remove("over"));
+      saveState();
+    } else if (!cancelled) {
+      popFor === d.chip ? closePop() : openPop(d.chip);
+    }
+  }
+  document.addEventListener("pointerup", () => endDrag(false));
+  document.addEventListener("pointercancel", () => endDrag(true));
+
+  // ---------- Toast ----------
+  const toastEl = $("#toast");
+  let toastT;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastT);
+    toastT = setTimeout(() => toastEl.classList.remove("show"), 2200);
+  }
+
+  // ---------- Reset (inline confirm) ----------
+  const resetBtn = $("#resetBtn");
+  let resetArmed = null;
+  resetBtn.addEventListener("click", () => {
+    if (!resetArmed) {
+      resetBtn.textContent = "Sure?";
+      resetBtn.classList.add("danger");
+      resetArmed = setTimeout(disarm, 3000);
+      return;
+    }
+    disarm();
+    closePop();
+    render(null);
+    saveState();
+    toast("Board reset");
+  });
+  function disarm() {
+    clearTimeout(resetArmed); resetArmed = null;
+    resetBtn.textContent = "Reset";
+    resetBtn.classList.remove("danger");
+  }
+
+  // ---------- Export ----------
+  const board = $("#board");
+  const exportOpts = {
+    pixelRatio: 2,
+    backgroundColor: "#f6f7f9",
+    style: { padding: "28px" },
+  };
+
+  async function renderBoard(kind) {
+    if (!window.htmlToImage) throw new Error("Export library failed to load (are you offline?)");
+    const title = board.querySelector(".export-title");
+    title.innerHTML = 'Rank the <em style="font-style:normal;color:#2563eb">system design</em> stack.';
+    title.style.cssText = "display:block;margin:0 0 20px;font:900 30px/1.1 Inter,system-ui,sans-serif;letter-spacing:-.03em;color:#0f172a";
+    const fn = kind === "blob" ? htmlToImage.toBlob : htmlToImage.toPng;
+    try {
+      return await fn(board, exportOpts);
+    } catch (err) {
+      // Cross-origin font CSS can trip the font embedder, so retry without it.
+      return await fn(board, { ...exportOpts, skipFonts: true });
+    } finally {
+      title.style.cssText = "";
+      title.innerHTML = "";
+    }
+  }
+
+  function withBusy(btn, label, work) {
+    return async () => {
+      const old = btn.textContent;
+      btn.disabled = true; btn.textContent = label;
+      try { await work(); }
+      catch (err) { console.error(err); toast(err.message || "Something went wrong"); }
+      finally { btn.disabled = false; btn.textContent = old; }
+    };
+  }
+
+  $("#downloadBtn").addEventListener("click", withBusy($("#downloadBtn"), "Rendering…", async () => {
+    closePop();
+    const url = await renderBoard("png");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "system-design-tier-list.png";
+    document.body.appendChild(a); a.click(); a.remove();
+    toast("PNG downloaded");
+  }));
+
+  $("#copyBtn").addEventListener("click", withBusy($("#copyBtn"), "Copying…", async () => {
+    closePop();
+    if (!navigator.clipboard || !window.ClipboardItem) throw new Error("Clipboard images aren't supported here. Use Download PNG instead.");
+    // Pass a promise so Safari keeps the user-gesture context.
+    await navigator.clipboard.write([new ClipboardItem({ "image/png": renderBoard("blob") })]);
+    toast("Copied to clipboard");
+  }));
+})();
+</script>
+</body>
+</html>
